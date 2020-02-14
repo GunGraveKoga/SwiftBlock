@@ -5,16 +5,6 @@
 //  Copyright © 2020. All rights reserved.
 //
 
-#if canImport(Darwin)
-@_exported import Darwin
-#else
-@_cdecl("_Block_copy")
-func _Block_copy(_ aBlock: UnsafeRawPointer!) -> UnsafeMutableRawPointer!
-
-@_cdecl("_Block_release")
-func _Block_release(_ aBlock: UnsafeRawPointer!) -> Void
-#endif
-
 public struct _BLockFlags : OptionSet {
     static let deallocating = _BLockFlags(rawValue: 0x0001)
     static let referenceCountMask = _BLockFlags(rawValue: 0xfffe)
