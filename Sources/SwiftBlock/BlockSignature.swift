@@ -92,16 +92,18 @@ public struct _BlockSignature {
     }
     
     private static func _alignofEncoding(_ encoding: String, _ inStruct: Bool) -> (Int, Int) {
+        let typeQualifiers = "rnNoORV"
         let align: Int
         var i = encoding.startIndex
         let end = encoding.endIndex
         
         precondition(i != end)
-        
-        if encoding[i] == "r" {
+
+        while i != end && typeQualifiers.contains(encoding[i]) {
             i = encoding.index(i, offsetBy: 1, limitedBy: end) ?? end
-            precondition(i != end)
         }
+        
+        precondition(i != end)
         
         switch encoding[i] {
         case "c", "C": align = MemoryLayout<CChar>.alignment
@@ -259,15 +261,17 @@ public struct _BlockSignature {
     }
     
     private static func _sizeofEncoding(_ encoding: String) -> (Int, Int) {
+        let typeQualifiers = "rnNoORV"
         var i = encoding.startIndex
         let end = encoding.endIndex
         
         precondition(encoding.distance(from: i, to: end) != 0)
         
-        if encoding[i] == "r" {
+        while i != end && typeQualifiers.contains(encoding[i]) {
             i = encoding.index(i, offsetBy: 1, limitedBy: end) ?? end
-            precondition(i != end)
         }
+        
+        precondition(i != end)
         
         let size: Int
         
@@ -282,7 +286,7 @@ public struct _BlockSignature {
         case "D": size = MemoryLayout<CLongDouble>.size
         case "B": size = MemoryLayout<CBool>.size
         case "v": size = 0
-        case "*", "@", "#", ":":
+        case "*", "@", "#", ":", "%":
             do {
                 size = MemoryLayout<UnsafeMutableRawPointer>.size
                 if encoding[i] == "@" && encoding.distance(from: i, to: end) >= 1 &&
@@ -391,7 +395,7 @@ public struct _BlockSignature {
     }
     
     public init?<B>(fromBlock block: B) {
-        guard let signature = withUnsafeBlockReference(block, _BlockGetSignature) else {
+        guard let signature = withUnsafeBlockReference(block, _BlockGetSignatureString) else {
             return nil
         }
         

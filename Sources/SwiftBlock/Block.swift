@@ -48,7 +48,7 @@ public struct _BlockLiteral {
     public let descriptor: UnsafeMutablePointer<_BlockDescriptor_1>
 }
 
-public func _BlockGetSignature(_ block: UnsafeMutablePointer<_BlockLiteral>) -> String? {
+public func _BlockGetSignatureString(_ block: UnsafeMutablePointer<_BlockLiteral>) -> String? {
     let flags = _BLockFlags(rawValue: block.pointee.flags)
     
     if flags.contains(.hasSignature) {
